@@ -131,6 +131,7 @@ namespace cryptonote
         size_t requested_from_peer = 0;
         size_t sent = 0;
         size_t missed = 0;
+        size_t in_flight_requests = 0;
       };
       std::shared_ptr<connection_statistics> m_connection_stats;
 
@@ -141,6 +142,9 @@ namespace cryptonote
       void add_requested_from_me();
       void add_requested_from_peer();
       void add_sent();
+      void add_in_flight_requests();
+      void remove_in_flight_request();
+      bool can_process_additional_request(size_t requests = 1);
 
       size_t get_announcement_size() const;
       size_t get_received() const;
@@ -149,6 +153,7 @@ namespace cryptonote
       size_t get_sent() const;
       size_t get_total() const;
       size_t get_missed() const;
+      size_t get_in_flight_requests() const;
       std::string get_info() const;
       bool missed_announced_tx(const crypto::hash &tx_hash);
   };

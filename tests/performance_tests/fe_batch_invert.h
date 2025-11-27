@@ -1,4 +1,4 @@
-// Copyright (c) 2022-2024, The Monero Project
+// Copyright (c) 2025, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -25,32 +25,55 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// 
+// Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
 
-extern "C"
+#include <memory>
+
+#include "crypto/crypto.h"
+
+template<bool batched>
+class test_fe_batch_invert
 {
-#include "crypto-ops.h"
-}
-#include "crypto.h"
+public:
+  static const size_t loop_count = 50;
+  static const size_t n_elems = 1000;
 
-namespace crypto
-{
+  bool init()
+  {
+    m_fes = std::make_unique<fe[]>(n_elems);
 
-public_key get_G();
-public_key get_H();
-public_key get_T();
-public_key get_U();
-public_key get_V();
-ge_p3 get_G_p3();
-ge_p3 get_H_p3();
-ge_p3 get_T_p3();
-ge_p3 get_U_p3();
-ge_p3 get_V_p3();
-ge_cached get_G_cached();
-ge_cached get_H_cached();
-ge_cached get_T_cached();
-ge_cached get_U_cached();
-ge_cached get_V_cached();
+    for (std::size_t i = 0; i < n_elems; ++i)
+    {
+      crypto::secret_key r;
+      crypto::random32_unbiased((unsigned char*)r.data);
 
-} //namespace crypto
+      ge_p3 point;
+      ge_scalarmult_base(&point, (unsigned char*)r.data);
+
+      memcpy(m_fes[i], &point.Y, sizeof(fe));
+    }
+
+    return true;
+  }
+
+  bool test()
+  {
+    std::unique_ptr<fe[]> inv_fes = std::make_unique<fe[]>(n_elems);
+
+    if constexpr (batched)
+      fe_batch_invert(inv_fes.get(), m_fes.get(), n_elems);
+    else
+    {
+      for (std::size_t i = 0; i < n_elems; ++i)
+        fe_invert(inv_fes[i], m_fes[i]);
+    }
+
+    return true;
+  }
+
+private:
+  std::unique_ptr<fe[]> m_fes;
+};

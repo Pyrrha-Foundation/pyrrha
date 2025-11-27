@@ -1,4 +1,4 @@
-// Copyright (c) 2022-2024, The Monero Project
+// Copyright (c) 2025, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -19,38 +19,39 @@
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
-// THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
 // PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+//paired header
+#include "device.h"
 
-extern "C"
+//local headers
+#include "ringct/rctOps.h"
+
+//third party headers
+
+//standard headers
+
+#undef MONERO_DEFAULT_LOG_CATEGORY
+#define MONERO_DEFAULT_LOG_CATEGORY "carrot.device"
+
+namespace carrot
 {
-#include "crypto-ops.h"
+//-------------------------------------------------------------------------------------------------------------------
+bool view_incoming_key_device::view_key_scalar_mult8_ed25519(const crypto::public_key &P,
+    crypto::public_key &kv8P) const
+{
+    // Is slow b/c it does 2 compressions, override if you want speed
+
+    if (!this->view_key_scalar_mult_ed25519(P, kv8P))
+        return false;
+
+    kv8P = rct::rct2pk(rct::scalarmult8(rct::pk2rct(kv8P)));
+    return true;
 }
-#include "crypto.h"
-
-namespace crypto
-{
-
-public_key get_G();
-public_key get_H();
-public_key get_T();
-public_key get_U();
-public_key get_V();
-ge_p3 get_G_p3();
-ge_p3 get_H_p3();
-ge_p3 get_T_p3();
-ge_p3 get_U_p3();
-ge_p3 get_V_p3();
-ge_cached get_G_cached();
-ge_cached get_H_cached();
-ge_cached get_T_cached();
-ge_cached get_U_cached();
-ge_cached get_V_cached();
-
-} //namespace crypto
+//-------------------------------------------------------------------------------------------------------------------
+} //namespace carrot

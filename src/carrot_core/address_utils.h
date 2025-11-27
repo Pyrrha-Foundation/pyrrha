@@ -1,4 +1,4 @@
-// Copyright (c) 2022-2024, The Monero Project
+// Copyright (c) 2024, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -26,31 +26,58 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+// Utilities for building carrot addresses.
+
 #pragma once
 
-extern "C"
+//local headers
+#include "crypto/crypto.h"
+
+//third party headers
+
+//standard headers
+
+//forward declarations
+
+
+namespace carrot
 {
-#include "crypto-ops.h"
+
+/**
+* brief: is_main_address_index - determine whether j=(j_major, j_minor) represents the main address
+*/
+static constexpr bool is_main_address_index(const std::uint32_t j_major, const std::uint32_t j_minor)
+{
+    return !(j_major || j_minor);
 }
-#include "crypto.h"
 
-namespace crypto
-{
+/**
+* brief: make_carrot_index_extension_generator - s^j_gen
+*   s^j_gen = H_32[s_ga](j_major, j_minor)
+* param: s_generate_address - s_ga
+* param: j_major -
+* param: j_minor -
+* outparam: address_generator_out - s^j_gen
+*/
+void make_carrot_index_extension_generator(const crypto::secret_key &s_generate_address,
+    const std::uint32_t j_major,
+    const std::uint32_t j_minor,
+    crypto::secret_key &address_generator_out);
+/**
+* brief: make_carrot_address_privkey - d^j_a
+*   k^j_subscal = H_n[s^j_gen](K_s, K_v, j_major, j_minor)
+* param: account_spend_pubkey - K_s = k_vb X + k_m U
+* param: account_view_pubkey - K_v = k_v K_s
+* param: s_address_generator - s^j_gen
+* param: j_major -
+* param: j_minor -
+* outparam: subaddress_scalar_out - k^j_subscal
+*/
+void make_carrot_subaddress_scalar(const crypto::public_key &account_spend_pubkey,
+    const crypto::public_key &account_view_pubkey,
+    const crypto::secret_key &s_address_generator,
+    const std::uint32_t j_major,
+    const std::uint32_t j_minor,
+    crypto::secret_key &subaddress_scalar_out);
 
-public_key get_G();
-public_key get_H();
-public_key get_T();
-public_key get_U();
-public_key get_V();
-ge_p3 get_G_p3();
-ge_p3 get_H_p3();
-ge_p3 get_T_p3();
-ge_p3 get_U_p3();
-ge_p3 get_V_p3();
-ge_cached get_G_cached();
-ge_cached get_H_cached();
-ge_cached get_T_cached();
-ge_cached get_U_cached();
-ge_cached get_V_cached();
-
-} //namespace crypto
+} //namespace carrot

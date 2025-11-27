@@ -1,4 +1,4 @@
-// Copyright (c) 2022-2024, The Monero Project
+// Copyright (c) 2025, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -25,32 +25,42 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
 
-extern "C"
+#include "crypto/random.h"
+#include "ringct/rctOps.h"
+
+template<bool fast>
+class test_zero_commit
 {
-#include "crypto-ops.h"
-}
-#include "crypto.h"
+public:
+  static const size_t loop_count = 1000;
 
-namespace crypto
-{
+  bool init()
+  {
+    m_amount = crypto::rand<uint64_t>();
+    return true;
+  }
 
-public_key get_G();
-public_key get_H();
-public_key get_T();
-public_key get_U();
-public_key get_V();
-ge_p3 get_G_p3();
-ge_p3 get_H_p3();
-ge_p3 get_T_p3();
-ge_p3 get_U_p3();
-ge_p3 get_V_p3();
-ge_cached get_G_cached();
-ge_cached get_H_cached();
-ge_cached get_T_cached();
-ge_cached get_U_cached();
-ge_cached get_V_cached();
+  bool test()
+  {
+    if constexpr (fast)
+    {
+      rct::zeroCommitVartime(m_amount);
+    }
+    else
+    {
+      // Old way of doing it
+      rct::key am = rct::d2h(m_amount);
+      rct::key bH = rct::scalarmultH(am);
+      rct::addKeys(rct::G, bH);
+    }
+    return true;
+  }
 
-} //namespace crypto
+private:
+  uint64_t m_amount;
+};

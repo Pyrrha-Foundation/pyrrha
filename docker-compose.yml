@@ -1,0 +1,152 @@
+version: "3.9"
+
+x-pyrrha-node: &pyrrha-node
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: pyrrha:local
+  restart: unless-stopped
+  stop_grace_period: 30s
+  networks:
+    - pyrrha
+
+services:
+  pyrrha-seed:
+    <<: *pyrrha-node
+    container_name: pyrrha-seed
+    environment:
+      - PYRRHA_MINER_ADDRESS=${PYRRHA_MINER_ADDRESS:?Set PYRRHA_MINER_ADDRESS to a valid Pyrrha address}
+    volumes:
+      - ./data/node-seed:/home/pyrrha/.pyrrha
+    ports:
+      - "21090:21090"
+      - "21091:21091"
+      - "21092:21092"
+    command:
+      - monerod
+      - --data-dir=/home/pyrrha/.pyrrha
+      - --p2p-bind-ip=0.0.0.0
+      - --p2p-bind-port=21090
+      - --rpc-bind-ip=0.0.0.0
+      - --rpc-bind-port=21091
+      - --zmq-rpc-bind-ip=0.0.0.0
+      - --zmq-rpc-bind-port=21092
+      - --confirm-external-bind
+      - --non-interactive
+      - --prune-blockchain
+      - --fixed-difficulty=1
+      - --start-mining=${PYRRHA_MINER_ADDRESS}
+      - --mining-threads=1
+      - --enable-dns-blocklist=0
+      - --add-priority-node=pyrrha-peer-1:30090
+      - --add-priority-node=pyrrha-peer-2:40090
+      - --add-priority-node=pyrrha-peer-3:50090
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf -d '{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_info\"}' -H 'Content-Type: application/json' http://localhost:21091/json_rpc | grep -q '\"status\":\"OK\"'"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  pyrrha-peer-1:
+    <<: *pyrrha-node
+    container_name: pyrrha-peer-1
+    volumes:
+      - ./data/node-1:/home/pyrrha/.pyrrha
+    ports:
+      - "30090:30090"
+      - "30091:30091"
+      - "30092:30092"
+    command:
+      - monerod
+      - --data-dir=/home/pyrrha/.pyrrha
+      - --p2p-bind-ip=0.0.0.0
+      - --p2p-bind-port=30090
+      - --rpc-bind-ip=0.0.0.0
+      - --rpc-bind-port=30091
+      - --zmq-rpc-bind-ip=0.0.0.0
+      - --zmq-rpc-bind-port=30092
+      - --confirm-external-bind
+      - --non-interactive
+      - --prune-blockchain
+      - --fixed-difficulty=1
+      - --enable-dns-blocklist=0
+      - --add-priority-node=pyrrha-seed:21090
+      - --add-priority-node=pyrrha-peer-2:40090
+      - --add-priority-node=pyrrha-peer-3:50090
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf -d '{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_info\"}' -H 'Content-Type: application/json' http://localhost:30091/json_rpc | grep -q '\"status\":\"OK\"'"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  pyrrha-peer-2:
+    <<: *pyrrha-node
+    container_name: pyrrha-peer-2
+    volumes:
+      - ./data/node-2:/home/pyrrha/.pyrrha
+    ports:
+      - "40090:40090"
+      - "40091:40091"
+      - "40092:40092"
+    command:
+      - monerod
+      - --data-dir=/home/pyrrha/.pyrrha
+      - --p2p-bind-ip=0.0.0.0
+      - --p2p-bind-port=40090
+      - --rpc-bind-ip=0.0.0.0
+      - --rpc-bind-port=40091
+      - --zmq-rpc-bind-ip=0.0.0.0
+      - --zmq-rpc-bind-port=40092
+      - --confirm-external-bind
+      - --non-interactive
+      - --prune-blockchain
+      - --fixed-difficulty=1
+      - --enable-dns-blocklist=0
+      - --add-priority-node=pyrrha-seed:21090
+      - --add-priority-node=pyrrha-peer-1:30090
+      - --add-priority-node=pyrrha-peer-3:50090
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf -d '{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_info\"}' -H 'Content-Type: application/json' http://localhost:40091/json_rpc | grep -q '\"status\":\"OK\"'"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  pyrrha-peer-3:
+    <<: *pyrrha-node
+    container_name: pyrrha-peer-3
+    volumes:
+      - ./data/node-3:/home/pyrrha/.pyrrha
+    ports:
+      - "50090:50090"
+      - "50091:50091"
+      - "50092:50092"
+    command:
+      - monerod
+      - --data-dir=/home/pyrrha/.pyrrha
+      - --p2p-bind-ip=0.0.0.0
+      - --p2p-bind-port=50090
+      - --rpc-bind-ip=0.0.0.0
+      - --rpc-bind-port=50091
+      - --zmq-rpc-bind-ip=0.0.0.0
+      - --zmq-rpc-bind-port=50092
+      - --confirm-external-bind
+      - --non-interactive
+      - --prune-blockchain
+      - --fixed-difficulty=1
+      - --enable-dns-blocklist=0
+      - --add-priority-node=pyrrha-seed:21090
+      - --add-priority-node=pyrrha-peer-1:30090
+      - --add-priority-node=pyrrha-peer-2:40090
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf -d '{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_info\"}' -H 'Content-Type: application/json' http://localhost:50091/json_rpc | grep -q '\"status\":\"OK\"'"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+networks:
+  pyrrha:
+    driver: bridge

@@ -14,6 +14,7 @@ services:
     <<: *pyrrha-node
     build: *pyrrha-build
     container_name: pyrrha-seed
+    entrypoint: ["seed-entrypoint.sh"]
     volumes:
       - ./data/node-seed:/home/pyrrha/.pyrrha
     ports:

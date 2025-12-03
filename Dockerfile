@@ -18,7 +18,7 @@ COPY . .
 
 ARG NPROC
 RUN set -ex && \
-    git submodule init && git submodule update && \
+    git submodule init && git submodule update --depth 1 && \
     rm -rf build && \
     if [ -z "$NPROC" ] ; \
     then make -j$(nproc) depends target=x86_64-linux-gnu ; \

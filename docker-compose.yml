@@ -1,5 +1,3 @@
-version: "3.9"
-
 x-pyrrha-build: &pyrrha-build
   context: .
   dockerfile: Dockerfile

@@ -1,9 +1,10 @@
 version: "3.9"
 
+x-pyrrha-build: &pyrrha-build
+  context: .
+  dockerfile: Dockerfile
+
 x-pyrrha-node: &pyrrha-node
-  build:
-    context: .
-    dockerfile: Dockerfile
   image: pyrrha:local
   restart: unless-stopped
   stop_grace_period: 30s
@@ -13,6 +14,7 @@ x-pyrrha-node: &pyrrha-node
 services:
   pyrrha-seed:
     <<: *pyrrha-node
+    build: *pyrrha-build
     container_name: pyrrha-seed
     volumes:
       - ./data/node-seed:/home/pyrrha/.pyrrha
@@ -38,7 +40,7 @@ services:
       - "30091:30091"
       - "30092:30092"
     command:
-      - monerod
+      - pyrrhad
       - --data-dir=/home/pyrrha/.pyrrha
       - --p2p-bind-ip=0.0.0.0
       - --p2p-bind-port=30090
@@ -71,7 +73,7 @@ services:
       - "40091:40091"
       - "40092:40092"
     command:
-      - monerod
+      - pyrrhad
       - --data-dir=/home/pyrrha/.pyrrha
       - --p2p-bind-ip=0.0.0.0
       - --p2p-bind-port=40090
@@ -104,7 +106,7 @@ services:
       - "50091:50091"
       - "50092:50092"
     command:
-      - monerod
+      - pyrrhad
       - --data-dir=/home/pyrrha/.pyrrha
       - --p2p-bind-ip=0.0.0.0
       - --p2p-bind-port=50090

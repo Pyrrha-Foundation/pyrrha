@@ -70,11 +70,12 @@ Operational documentation will be refreshed during Phase 2 alongside the devnet 
 
 For a quick connectivity smoke test, a four-node Compose topology is included:
 
-1. Export a valid Pyrrha address for mining rewards: `export PYRRHA_MINER_ADDRESS="<your_pyrrha_address>"`.
-2. Launch the network: `docker compose up --build`.
-3. Wait for the health checks to report `healthy`, then query any node for status, e.g. `curl -d '{"jsonrpc":"2.0","id":"0","method":"get_info"}' -H 'Content-Type: application/json' http://localhost:21091/json_rpc`.
+1. Create a `.env` file from the provided template: `cp .env.example .env`.
+2. Replace the placeholder `PYRRHA_MINER_ADDRESS` value in `.env` with a valid Pyrrha address for mining rewards.
+3. Launch the network: `docker compose up --build`.
+4. Wait for the health checks to report `healthy`, then query any node for status, e.g. `curl -d '{"jsonrpc":"2.0","id":"0","method":"get_info"}' -H 'Content-Type: application/json' http://localhost:21091/json_rpc`.
 
-The seed node mines at fixed difficulty to bootstrap the chain, and each peer pins to the seed plus the other peers to validate gossip and block propagation. Data directories land under `./data/node-*` so you can wipe and restart cleanly.
+The seed node mines at fixed difficulty to bootstrap the chain, and each peer pins to the seed plus the other peers to validate gossip and block propagation. Data directories land under `./data/node-*` so you can wipe and restart cleanly. Docker Compose automatically reads the `.env` file, so keeping `PYRRHA_MINER_ADDRESS` populated there prevents interpolation errors when launching the stack.
 
 ## License
 

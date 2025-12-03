@@ -18,7 +18,7 @@ COPY . .
 
 ARG NPROC
 RUN set -ex && \
-    git submodule init && git submodule update && \
+    git submodule init && git submodule update --depth 1 && \
     rm -rf build && \
     if [ -z "$NPROC" ] ; \
     then make -j$(nproc) depends target=x86_64-linux-gnu ; \
@@ -35,7 +35,9 @@ RUN set -ex && \
     rm -rf /var/lib/apt
 COPY --from=builder /src/build/x86_64-linux-gnu/release/bin /usr/local/bin/
 COPY utils/seed-entrypoint.sh /usr/local/bin/seed-entrypoint.sh
+COPY utils/pyrrha-node-entrypoint.sh /usr/local/bin/pyrrha-node-entrypoint.sh
 RUN chmod +x /usr/local/bin/seed-entrypoint.sh
+RUN chmod +x /usr/local/bin/pyrrha-node-entrypoint.sh
 
 # Create pyrrha user
 RUN adduser --system --group --disabled-password pyrrha && \
@@ -55,9 +57,9 @@ EXPOSE 21090
 EXPOSE 21091
 EXPOSE 21092
 
-# switch to user pyrrha
-USER pyrrha
+# switch to root so entrypoints can fix host bind mount permissions before dropping privileges
+USER root
 
-ENTRYPOINT ["pyrrhad"]
-CMD ["--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=21090", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=21091", "--non-interactive", "--confirm-external-bind"]
+ENTRYPOINT ["/usr/local/bin/pyrrha-node-entrypoint.sh"]
+CMD ["pyrrhad", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=21090", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=21091", "--non-interactive", "--confirm-external-bind"]
 

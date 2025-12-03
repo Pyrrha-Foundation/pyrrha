@@ -302,11 +302,7 @@ namespace nodetool
 
   private:
     const std::vector<std::string> m_seed_nodes_list =
-    { "seeds.moneroseeds.se"
-    , "seeds.moneroseeds.ae.org"
-    , "seeds.moneroseeds.ch"
-    , "seeds.moneroseeds.li"
-    };
+    { /* Pyrrha DNS seeds will be added here in Phase 2 */ };
 
     bool islimitup=false;
     bool islimitdown=false;

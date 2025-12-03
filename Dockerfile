@@ -48,7 +48,7 @@ VOLUME /home/pyrrha/.pyrrha
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
-# monero-wallet-cli
+# pyrrha-wallet-cli
 VOLUME /wallet
 
 EXPOSE 21090
@@ -58,6 +58,6 @@ EXPOSE 21092
 # switch to user pyrrha
 USER pyrrha
 
-ENTRYPOINT ["monerod"]
+ENTRYPOINT ["pyrrhad"]
 CMD ["--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=21090", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=21091", "--non-interactive", "--confirm-external-bind"]
 

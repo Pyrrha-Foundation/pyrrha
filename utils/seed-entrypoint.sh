@@ -11,7 +11,7 @@ mkdir -p "$DATA_DIR"
 if [ ! -s "$ADDRESS_FILE" ]; then
   echo "[seed-entrypoint] Generating new miner wallet and address..."
   # Create a new wallet and capture the address line. The wallet is left empty; no password is set for local dev.
-  monero-wallet-cli \
+  pyrrha-wallet-cli \
     --generate-new-wallet "$WALLET_FILE" \
     --password "" \
     --mnemonic-language English \
@@ -30,7 +30,7 @@ else
   echo "[seed-entrypoint] Reusing existing miner address: $ADDRESS"
 fi
 
-exec monerod \
+exec pyrrhad \
   --data-dir="$DATA_DIR" \
   --p2p-bind-ip=0.0.0.0 \
   --p2p-bind-port=21090 \

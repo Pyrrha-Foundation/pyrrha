@@ -45,8 +45,8 @@ target_link_libraries(cn_deserialize
     ${CMAKE_THREAD_LIBS_INIT})
 
 set_property(TARGET cn_deserialize
-	PROPERTY
-	OUTPUT_NAME "monero-utils-deserialize")
+        PROPERTY
+        OUTPUT_NAME "pyrrha-utils-deserialize")
 
 
 set(object_sizes_sources
@@ -66,8 +66,8 @@ target_link_libraries(object_sizes
     ${CMAKE_THREAD_LIBS_INIT})
 
 set_property(TARGET object_sizes
-	PROPERTY
-	OUTPUT_NAME "monero-utils-object-sizes")
+        PROPERTY
+        OUTPUT_NAME "pyrrha-utils-object-sizes")
 
 
 set(dns_checks_sources
@@ -88,6 +88,6 @@ target_link_libraries(dns_checks
     ${CMAKE_THREAD_LIBS_INIT})
 
 set_property(TARGET dns_checks
-	PROPERTY
-	OUTPUT_NAME "monero-utils-dns-checks")
+        PROPERTY
+        OUTPUT_NAME "pyrrha-utils-dns-checks")
 

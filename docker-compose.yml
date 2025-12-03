@@ -14,33 +14,13 @@ services:
   pyrrha-seed:
     <<: *pyrrha-node
     container_name: pyrrha-seed
-    environment:
-      - PYRRHA_MINER_ADDRESS=${PYRRHA_MINER_ADDRESS:?Set PYRRHA_MINER_ADDRESS to a valid Pyrrha address}
     volumes:
       - ./data/node-seed:/home/pyrrha/.pyrrha
     ports:
       - "21090:21090"
       - "21091:21091"
       - "21092:21092"
-    command:
-      - monerod
-      - --data-dir=/home/pyrrha/.pyrrha
-      - --p2p-bind-ip=0.0.0.0
-      - --p2p-bind-port=21090
-      - --rpc-bind-ip=0.0.0.0
-      - --rpc-bind-port=21091
-      - --zmq-rpc-bind-ip=0.0.0.0
-      - --zmq-rpc-bind-port=21092
-      - --confirm-external-bind
-      - --non-interactive
-      - --prune-blockchain
-      - --fixed-difficulty=1
-      - --start-mining=${PYRRHA_MINER_ADDRESS}
-      - --mining-threads=1
-      - --enable-dns-blocklist=0
-      - --add-priority-node=pyrrha-peer-1:30090
-      - --add-priority-node=pyrrha-peer-2:40090
-      - --add-priority-node=pyrrha-peer-3:50090
+    command: ["seed-entrypoint.sh"]
     healthcheck:
       test: ["CMD-SHELL", "curl -sf -d '{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_info\"}' -H 'Content-Type: application/json' http://localhost:21091/json_rpc | grep -q '\"status\":\"OK\"'"]
       interval: 20s

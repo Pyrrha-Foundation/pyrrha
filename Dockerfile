@@ -34,6 +34,8 @@ RUN set -ex && \
     apt-get clean && \
     rm -rf /var/lib/apt
 COPY --from=builder /src/build/x86_64-linux-gnu/release/bin /usr/local/bin/
+COPY utils/seed-entrypoint.sh /usr/local/bin/seed-entrypoint.sh
+RUN chmod +x /usr/local/bin/seed-entrypoint.sh
 
 # Create pyrrha user
 RUN adduser --system --group --disabled-password pyrrha && \

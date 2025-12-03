@@ -6,6 +6,15 @@ WALLET_FILE="$DATA_DIR/miner-wallet"
 ADDRESS_FILE="$DATA_DIR/miner-address.txt"
 LOG_FILE="$DATA_DIR/miner-wallet.log"
 
+# If we're running as root (common when the host bind-mount is owned by root),
+# ensure the data directory is writable and drop privileges to the pyrrha user
+# before continuing.
+if [[ "${SEED_ENTRYPOINT_AS_PYRRHA:-0}" != "1" && $(id -u) -eq 0 ]]; then
+  mkdir -p "$DATA_DIR"
+  chown -R pyrrha:pyrrha "$DATA_DIR"
+  exec su -s /bin/bash pyrrha -c "SEED_ENTRYPOINT_AS_PYRRHA=1 DATA_DIR=$DATA_DIR WALLET_FILE=$WALLET_FILE ADDRESS_FILE=$ADDRESS_FILE LOG_FILE=$LOG_FILE /usr/local/bin/seed-entrypoint.sh"
+fi
+
 mkdir -p "$DATA_DIR"
 
 if [ ! -s "$ADDRESS_FILE" ]; then
@@ -44,7 +53,6 @@ exec pyrrhad \
   --fixed-difficulty=1 \
   --start-mining="$ADDRESS" \
   --mining-threads=1 \
-  --enable-dns-blocklist=0 \
   --add-priority-node=pyrrha-peer-1:30090 \
   --add-priority-node=pyrrha-peer-2:40090 \
   --add-priority-node=pyrrha-peer-3:50090

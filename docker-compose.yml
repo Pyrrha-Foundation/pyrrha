@@ -51,7 +51,6 @@ services:
       - --non-interactive
       - --prune-blockchain
       - --fixed-difficulty=1
-      - --enable-dns-blocklist=0
       - --add-priority-node=pyrrha-seed:21090
       - --add-priority-node=pyrrha-peer-2:40090
       - --add-priority-node=pyrrha-peer-3:50090
@@ -84,7 +83,6 @@ services:
       - --non-interactive
       - --prune-blockchain
       - --fixed-difficulty=1
-      - --enable-dns-blocklist=0
       - --add-priority-node=pyrrha-seed:21090
       - --add-priority-node=pyrrha-peer-1:30090
       - --add-priority-node=pyrrha-peer-3:50090
@@ -117,7 +115,6 @@ services:
       - --non-interactive
       - --prune-blockchain
       - --fixed-difficulty=1
-      - --enable-dns-blocklist=0
       - --add-priority-node=pyrrha-seed:21090
       - --add-priority-node=pyrrha-peer-1:30090
       - --add-priority-node=pyrrha-peer-2:40090

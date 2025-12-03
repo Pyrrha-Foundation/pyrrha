@@ -1,5 +1,3 @@
-version: "3.9"
-
 x-pyrrha-build: &pyrrha-build
   context: .
   dockerfile: Dockerfile
@@ -19,9 +17,9 @@ services:
     volumes:
       - ./data/node-seed:/home/pyrrha/.pyrrha
     ports:
-      - "21090:21090"
-      - "21091:21091"
-      - "21092:21092"
+      - "${PYRRHA_SEED_P2P_PORT:-}:21090"
+      - "${PYRRHA_SEED_RPC_PORT:-}:21091"
+      - "${PYRRHA_SEED_ZMQ_PORT:-}:21092"
     command: ["seed-entrypoint.sh"]
     healthcheck:
       test: ["CMD-SHELL", "curl -sf -d '{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_info\"}' -H 'Content-Type: application/json' http://localhost:21091/json_rpc | grep -q '\"status\":\"OK\"'"]
@@ -36,9 +34,9 @@ services:
     volumes:
       - ./data/node-1:/home/pyrrha/.pyrrha
     ports:
-      - "30090:30090"
-      - "30091:30091"
-      - "30092:30092"
+      - "${PYRRHA_PEER1_P2P_PORT:-}:30090"
+      - "${PYRRHA_PEER1_RPC_PORT:-}:30091"
+      - "${PYRRHA_PEER1_ZMQ_PORT:-}:30092"
     command:
       - pyrrhad
       - --data-dir=/home/pyrrha/.pyrrha
@@ -69,9 +67,9 @@ services:
     volumes:
       - ./data/node-2:/home/pyrrha/.pyrrha
     ports:
-      - "40090:40090"
-      - "40091:40091"
-      - "40092:40092"
+      - "${PYRRHA_PEER2_P2P_PORT:-}:40090"
+      - "${PYRRHA_PEER2_RPC_PORT:-}:40091"
+      - "${PYRRHA_PEER2_ZMQ_PORT:-}:40092"
     command:
       - pyrrhad
       - --data-dir=/home/pyrrha/.pyrrha
@@ -102,9 +100,9 @@ services:
     volumes:
       - ./data/node-3:/home/pyrrha/.pyrrha
     ports:
-      - "50090:50090"
-      - "50091:50091"
-      - "50092:50092"
+      - "${PYRRHA_PEER3_P2P_PORT:-}:50090"
+      - "${PYRRHA_PEER3_RPC_PORT:-}:50091"
+      - "${PYRRHA_PEER3_ZMQ_PORT:-}:50092"
     command:
       - pyrrhad
       - --data-dir=/home/pyrrha/.pyrrha

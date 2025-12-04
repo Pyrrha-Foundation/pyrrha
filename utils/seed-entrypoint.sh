@@ -42,7 +42,8 @@ if [ ! -s "$ADDRESS_FILE" ]; then
     fi
   fi
 
-  ADDRESS=$(grep -m1 '^Address' "$LOG_FILE" | awk '{print $2}')
+  ADDRESS_LINE=$(grep -m1 '^Address' "$LOG_FILE" || true)
+  ADDRESS=$(echo "$ADDRESS_LINE" | awk '{print $2}')
   if [ -z "${ADDRESS:-}" ]; then
     echo "[seed-entrypoint] Failed to derive address; check $LOG_FILE for details" >&2
     exit 1

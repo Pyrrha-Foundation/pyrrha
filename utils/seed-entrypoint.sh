@@ -20,11 +20,15 @@ mkdir -p "$DATA_DIR"
 if [ ! -s "$ADDRESS_FILE" ]; then
   echo "[seed-entrypoint] Generating new miner wallet and address..."
   # Create a new wallet and capture the address line. The wallet is left empty; no password is set for local dev.
-  pyrrha-wallet-cli \
+  if ! pyrrha-wallet-cli \
     --generate-new-wallet "$WALLET_FILE" \
     --password "" \
     --mnemonic-language English \
-    --command address >"$LOG_FILE" 2>&1
+    --command address >"$LOG_FILE" 2>&1; then
+    echo "[seed-entrypoint] Wallet creation failed; contents of $LOG_FILE:" >&2
+    cat "$LOG_FILE" >&2
+    exit 1
+  fi
 
   ADDRESS=$(grep -m1 '^Address' "$LOG_FILE" | awk '{print $2}')
   if [ -z "${ADDRESS:-}" ]; then
